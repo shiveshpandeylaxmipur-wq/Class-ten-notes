@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Class 10 Notes</title>
+<meta name="description" content="Class 10 के सभी विषयों के मुफ्त नोट्स और PDF डाउनलोड करें।">
+<style>
+:root{--blue:#155eef;--ink:#172033;--muted:#667085;--bg:#f5f7fb;--line:#e4e7ec}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Devanagari",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(120deg,#1247b8,#3478f6);color:white;padding:28px 18px}
+.wrap{max-width:1000px;margin:auto;padding:0 16px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h1{font-size:clamp(26px,5vw,40px);margin:0}header p{margin:8px 0 0;color:#eaf1ff}
+button,.btn{border:0;border-radius:10px;padding:11px 15px;background:var(--blue);color:white;font-weight:650;cursor:pointer;text-decoration:none;display:inline-block}
+header button{background:white;color:#1649b8}
+main{padding:24px 0 50px}.intro{background:white;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:18px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+input,select{padding:12px;border:1px solid #d0d5dd;border-radius:10px;font:inherit;background:white;min-width:0}
+#search{flex:1;min-width:180px}.subjects{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin:16px 0}
+.subject{background:white;border:1px solid var(--line);border-radius:12px;padding:13px;text-align:left;color:var(--ink)}
+.subject.active{border:2px solid var(--blue);background:#eff4ff}
+#notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.note{background:white;border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:9px}
+.note h3{margin:0;font-size:18px}.meta{font-size:13px;color:var(--muted)}
+.note a{align-self:flex-start}.empty{padding:25px;text-align:center;color:var(--muted);background:white;border-radius:12px}
+footer{text-align:center;color:var(--muted);padding:22px;font-size:13px}
+.modal{position:fixed;inset:0;background:#10182899;display:none;align-items:center;justify-content:center;padding:16px;z-index:5}
+.panel{background:white;border-radius:16px;padding:20px;width:min(480px,100%);max-height:90vh;overflow:auto}
+.panel h2{margin-top:0}.field{display:grid;gap:6px;margin:12px 0}.field input,.field select{width:100%}
+.help{font-size:13px;color:var(--muted);line-height:1.5}.row{display:flex;gap:8px;flex-wrap:wrap}.status{font-size:14px;margin-top:10px;white-space:pre-wrap}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header><div class="wrap top">
+ <div><h1>📚 Class 10 Notes</h1><p>कक्षा 10 के नोट्स — बिल्कुल मुफ्त</p></div>
+ <button id="adminOpen">Admin Login</button>
+</div></header>
+<main class="wrap">
+ <section class="intro">
+  <h2>अपना विषय चुनें और नोट्स पढ़ें</h2>
+  <p>सभी विद्यार्थी बिना अकाउंट बनाए PDF नोट्स देख और डाउनलोड कर सकते हैं।</p>
+  <div class="controls"><input id="search" placeholder="नोट्स या चैप्टर खोजें…"><select id="subjectFilter"><option value="">सभी विषय</option></select></div>
+ </section>
+ <div class="subjects" id="subjectButtons"></div>
+ <section id="notes"><div class="empty">नोट्स लोड हो रहे हैं…</div></section>
+</main>
+<footer>Class 10 Notes · Free Study Material</footer>
+
+<div class="modal" id="loginModal"><div class="panel">
+ <div class="row" style="justify-content:space-between;align-items:center"><h2>Admin Login</h2><button id="closeLogin" style="background:#eef2f6;color:#344054">बंद करें</button></div>
+ <p class="help">यह लॉगिन केवल वेबसाइट के Admin के लिए है। विद्यार्थियों को लॉगिन की जरूरत नहीं है।</p>
+ <div class="field"><label>Email</label><input id="email" type="email" autocomplete="username" placeholder="Admin email"></div>
+ <div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Password"></div>
+ <button id="loginBtn">Login</button><div class="status" id="loginStatus"></div>
+ </div></div>
+
+<div class="modal" id="uploadModal"><div class="panel">
+ <div class="row" style="justify-content:space-between;align-items:center"><h2>Notes Upload</h2><button id="logoutBtn" style="background:#eef2f6;color:#344054">Logout</button></div>
+ <p class="help">PDF चुनें, विषय और अध्याय का नाम भरें। अपलोड होने के बाद नोट्स सभी विद्यार्थियों को दिखेंगे।</p>
+ <div class="field"><label>विषय</label><select id="uploadSubject"></select></div>
+ <div class="field"><label>Chapter / Notes का नाम</label><input id="noteTitle" maxlength="100" placeholder="जैसे: अध्याय 1 — वास्तविक संख्याएँ"></div>
+ <div class="field"><label>PDF फ़ाइल</label><input id="pdfFile" type="file" accept="application/pdf,.pdf"></div>
+ <button id="uploadBtn">PDF Upload करें</button><div class="status" id="uploadStatus"></div>
+ <div class="help">ध्यान दें: केवल वही सामग्री अपलोड करें जिसे साझा करने का आपको अधिकार है।</div>
+ </div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/*
+  SETUP: नीचे Supabase Project URL और anon key डालें।
+  Supabase Dashboard → Project Settings → API से मिलेंगे।
+*/
+const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+const SUBJECTS = ["हिंदी","English","गणित","विज्ञान","सामाजिक विज्ञान","संस्कृत"];
+const $ = id => document.getElementById(id);
+let client = null, currentSubject = "";
+
+function loadSupabase(){
+ if(!SUPABASE_URL.startsWith("https://") || SUPABASE_ANON_KEY.includes("YOUR_")) return false;
+ if(!window.supabase) return false;
+ client = window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+ return true;
+}
+function initSubjects(){
+ $("subjectFilter").innerHTML='<option value="">सभी विषय</option>'+SUBJECTS.map(s=>`<option>${s}</option>`).join("");
+ $("uploadSubject").innerHTML=SUBJECTS.map(s=>`<option>${s}</option>`).join("");
+ $("subjectButtons").innerHTML=SUBJECTS.map(s=>`<button class="subject" data-subject="${s}">${s}</button>`).join("");
+ document.querySelectorAll(".subject").forEach(b=>b.addEventListener("click",()=>{
+  currentSubject=currentSubject===b.dataset.subject?"":b.dataset.subject;
+  document.querySelectorAll(".subject").forEach(x=>x.classList.toggle("active",x.dataset.subject===currentSubject));
+  $("subjectFilter").value=currentSubject; renderNotes();
+ }));
+}
+function safe(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+async function renderNotes(){
+ const box=$("notes");
+ if(!client){box.innerHTML='<div class="empty">वेबसाइट का सेटअप अभी पूरा नहीं हुआ है। Admin को Supabase की जानकारी जोड़नी होगी।</div>';return;}
+ box.innerHTML='<div class="empty">नोट्स लोड हो रहे हैं…</div>';
+ const subject=$("subjectFilter").value, q=$("search").value.trim();
+ let query=client.from("notes").select("id,title,subject,file_url,created_at").order("created_at",{ascending:false});
+ if(subject) query=query.eq("subject",subject);
+ if(q) query=query.ilike("title",`%${q}%`);
+ const {data,error}=await query;
+ if(error){box.innerHTML='<div class="empty">नोट्स लोड नहीं हो सके। कृपया बाद में कोशिश करें।</div>';return;}
+ if(!data?.length){box.innerHTML='<div class="empty">अभी इस विषय के नोट्स उपलब्ध नहीं हैं।</div>';return;}
+ box.innerHTML=data.map(n=>`<article class="note"><div class="meta">${safe(n.subject)}</div><h3>${safe(n.title)}</h3><div class="meta">PDF Notes</div><a class="btn" href="${safe(n.file_url)}" target="_blank" rel="noopener">PDF देखें / डाउनलोड करें</a></article>`).join("");
+}
+$("search").addEventListener("input",renderNotes);
+$("subjectFilter").addEventListener("change",()=>{currentSubject=$("subjectFilter").value;renderNotes();});
+$("adminOpen").onclick=()=>{$("loginModal").style.display="flex";};
+$("closeLogin").onclick=()=>{$("loginModal").style.display="none";};
+$("loginModal").addEventListener("click",e=>{if(e.target===$("loginModal"))$("loginModal").style.display="none";});
+$("loginBtn").onclick=async()=>{
+ if(!client){$("loginStatus").textContent="पहले वेबसाइट का Supabase सेटअप पूरा करें।";return;}
+ $("loginStatus").textContent="Login हो रहा है…";
+ const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});
+ $("loginStatus").textContent=error?error.message:"Login सफल!";
+ if(!error){$("loginModal").style.display="none";$("uploadModal").style.display="flex";}
+};
+$("logoutBtn").onclick=async()=>{await client.auth.signOut();$("uploadModal").style.display="none";};
+$("uploadBtn").onclick=async()=>{
+ const status=$("uploadStatus"), file=$("pdfFile").files[0], title=$("noteTitle").value.trim(), subject=$("uploadSubject").value;
+ if(!file||!title){status.textContent="कृपया Notes का नाम और PDF फ़ाइल चुनें।";return;}
+ if(file.type!=="application/pdf" && !file.name.toLowerCase().endsWith(".pdf")){status.textContent="केवल PDF फ़ाइल अपलोड करें।";return;}
+ if(file.size>20*1024*1024){status.textContent="PDF का आकार 20 MB से कम रखें।";return;}
+ status.textContent="Upload हो रहा है…";
+ const {data:{user}}=await client.auth.getUser();
+ if(!user){status.textContent="Admin session समाप्त हो गया। दोबारा Login करें।";return;}
+ const path=`${user.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
+ const {error:upErr}=await client.storage.from("notes-pdf").upload(path,file,{contentType:"application/pdf",upsert:false});
+ if(upErr){status.textContent="Upload में समस्या: "+upErr.message;return;}
+ const {data:pub}=client.storage.from("notes-pdf").getPublicUrl(path);
+ const {error:dbErr}=await client.from("notes").insert({title,subject,file_url:pub.publicUrl,storage_path:path});
+ if(dbErr){status.textContent="PDF अपलोड हुई, लेकिन सूची में सेव नहीं हुई: "+dbErr.message;return;}
+ status.textContent="सफलतापूर्वक अपलोड हो गया।";
+ $("noteTitle").value="";$("pdfFile").value="";renderNotes();
+};
+initSubjects();
+if(loadSupabase()) {
+ client.auth.getSession().then(({data})=>{if(data.session)$("uploadModal").style.display="flex";});
+ renderNotes();
+} else {
+ $("notes").innerHTML='<div class="empty">ऑनलाइन नोट्स दिखाने के लिए पहले SETUP निर्देशों के अनुसार Supabase जोड़ें।</div>';
+}
+</script>
+</body></html>
